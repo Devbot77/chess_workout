@@ -1,3 +1,66 @@
 // Place all the styles related to the games controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+// Game variables
+$piece_size: 80px;
+
+// Gameboard styles
+
+#chessboard {
+	margin: none;
+	border-spacing: 0;
+	table {
+		margin: none;
+	}
+
+	td {
+		height: $piece_size;
+		width: $piece_size;
+		margin: none;
+		border-spacing: 0;
+	}
+}
+
+.board td, th {
+  border: 1px solid black;
+}
+
+.board {
+  border-spacing: 0;
+  border: 5px solid black;
+
+}
+
+.board td, th {
+
+  height: $piece_size;
+  width: $piece_size;
+  padding: 0;
+
+}
+
+.white_square {
+  background-color: white;
+}
+
+.black_square {
+  background-color: #999999;
+}
+
+.piece {
+  border-radius: 50%;
+  width: $piece_size;
+  line-height: $piece_size;
+  text-align: center;
+  margin: 0;
+  display: inline-block;
+}
+
+.white-piece {
+	background-color: #9378C2;
+}
+
+.black-piece {
+	background-color: #5A339C;
+}

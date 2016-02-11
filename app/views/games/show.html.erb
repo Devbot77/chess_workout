@@ -1,8 +1,27 @@
-<h1>Placeholder text to represent a chess game</h1>
 
-<% @game.pieces.each do |piece| %>
-   <%= piece.x_position %>, <%= piece.y_position %>
-   <br>
-<% end %>
+
+<div class="containter col-xs-10 col-xs-offset-1">
+	<h1>Game Number# <%= @game.id %></h1>
+	<br />
+	<table class="board" id="chessboard">
+		<tbody>
+			<% (0..7).each do |row_num| %>
+				<tr>
+					<% (0..7).each do |cell_num| %>
+						<% square = (row_num % 2 == cell_num % 2 ? "white_square" : "black_square") %>
+						<td id="x-<%= cell_num %> y-<%= row_num %>" class="<%= square %> ui-droppable">
+							<% piece = @game.pieces.where(:x_position => cell_num.to_s, :y_position => row_num.to_s).first %>
+							<% if piece %>
+								<div class="piece <%= piece.color %>-piece"><strong><%= piece.type %></strong></div>
+							<% end %>
+						</td>
+					<% end %>
+				</tr>
+			<% end %>
+		</tbody>
+	</table>
+</div>
+
+
 <p>Game turn: </p>
 <%= @game.turn %>
