@@ -152,6 +152,7 @@ class Piece < ActiveRecord::Base
 
   # Determine if checkmate on opposing king has occurred.
   def demo_checkmate?
+    binding.pry
     checkmate = false
     can_escape = false
     can_block = false
@@ -223,7 +224,7 @@ class Piece < ActiveRecord::Base
 
     x = x_coord + 1
     y = y_coord - 1
-    until x == 8 || y == 0 do
+    until x == 9 || y == 0 do
       range << [x, y]
       x += 1
       y -= 1
@@ -231,7 +232,7 @@ class Piece < ActiveRecord::Base
 
     x = x_coord + 1
     y = y_coord + 1
-    until x == 8 || y == 8 do
+    until x == 9 || y == 9 do
       range << [x, y]
       x += 1
       y += 1
@@ -239,7 +240,7 @@ class Piece < ActiveRecord::Base
 
     x = x_coord - 1
     y = y_coord + 1
-    until x == 0 || y == 8 do
+    until x == 0 || y == 9 do
       range << [x, y]
       x += 1
       y -= 1
@@ -269,215 +270,215 @@ class Piece < ActiveRecord::Base
     return @possible_moves
   end
 
-  def check?
-    # a) Determine a list of valid player moves that could put an enemy's king in check based upon where it is:
-    # all_white_possible_moves[0] == white_pawn_possible_moves
-    # all_white_possible_moves[1] == white_rook_possible_moves
-    # all_white_possible_moves[2] == white_knight_possible_moves
-    # all_white_possible_moves[3] == white_bishop_possible_moves
-    # all_white_possible_moves[4] == white_queen_possible_moves
-    # all_white_possible_moves[5] == white_king_possible_moves
-    white_possible_moves
-    black_possible_moves
+  # def check?
+  #   # a) Determine a list of valid player moves that could put an enemy's king in check based upon where it is:
+  #   # all_white_possible_moves[0] == white_pawn_possible_moves
+  #   # all_white_possible_moves[1] == white_rook_possible_moves
+  #   # all_white_possible_moves[2] == white_knight_possible_moves
+  #   # all_white_possible_moves[3] == white_bishop_possible_moves
+  #   # all_white_possible_moves[4] == white_queen_possible_moves
+  #   # all_white_possible_moves[5] == white_king_possible_moves
+  #   white_possible_moves
+  #   black_possible_moves
 
-    # White pieces
-    if self.color == "white"
-      # n will be the piece type (6 piece types)
-      for n in 0..5
-        # Pawns
-        if n == 0
-          # There are pawns on the board
-          if @all_white_possible_moves[n] != nil
-            # There can be up to 8 pawns on the board
-            for m in 0..7
-              # The pawn exists:
-              if @all_white_possible_moves[n][m] != nil
-                # Each piece has up to 8 pairs of possible move coordinates returned.
-                for o in 0..7
-                  # The oth move of the pawn exists:
-                  if @all_white_possible_moves[n][m][o] != nil
-                    # e.g. all_white_possible_moves[0][0][0] == [x, y] of first possible move of the first pawn
-                    if @all_white_possible_moves[n][m][o][0] == @black_king.x_position && @all_white_possible_moves[n][m][o][1] == @black_king.y_position
-                      checkmate?
-                      return true
-                    end
-                  end
-                end
-              end
-            end
-          end
-        # Rooks, knights, and bishops
-        elsif n == 1 || n == 2 || n == 3
-          # There are rooks, knights, or bishops on the board
-          if @all_white_possible_moves[n] != nil
-            # Rooks, knights, and bishops come in pairs
-            for m in 0..1
-              if @all_white_possible_moves[n][m] != nil
-                for o in 0..7
-                  if @all_white_possible_moves[n][m][o] != nil
-                    if @all_white_possible_moves[n][m][o][0] == @black_king.x_position && @all_white_possible_moves[n][m][o][1] == @black_king.y_position
-                      checkmate?
-                      return true
-                    end
-                  end
-                end
-              end
-            end
-          end
-        # Queen or king
-        else
-          # The queen or king is on the board
-          if @all_white_possible_moves[n] != nil
-            if @all_white_possible_moves[n][0] != nil
-            # King or queen are unique pieces (m will always be 0)
-              for o in 0..7
-                if @all_white_possible_moves[n][m][o] != nil
-                  if @all_white_possible_moves[n][m][o][0] == @black_king.x_position && @all_white_possible_moves[n][m][o][1] == @black_king.y_position
-                    checkmate?
-                    return true
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
+  #   # White pieces
+  #   if self.color == "white"
+  #     # n will be the piece type (6 piece types)
+  #     for n in 0..5
+  #       # Pawns
+  #       if n == 0
+  #         # There are pawns on the board
+  #         if @all_white_possible_moves[n] != nil
+  #           # There can be up to 8 pawns on the board
+  #           for m in 0..7
+  #             # The pawn exists:
+  #             if @all_white_possible_moves[n][m] != nil
+  #               # Each piece has up to 8 pairs of possible move coordinates returned.
+  #               for o in 0..7
+  #                 # The oth move of the pawn exists:
+  #                 if @all_white_possible_moves[n][m][o] != nil
+  #                   # e.g. all_white_possible_moves[0][0][0] == [x, y] of first possible move of the first pawn
+  #                   if @all_white_possible_moves[n][m][o][0] == @black_king.x_position && @all_white_possible_moves[n][m][o][1] == @black_king.y_position
+  #                     checkmate?
+  #                     return true
+  #                   end
+  #                 end
+  #               end
+  #             end
+  #           end
+  #         end
+  #       # Rooks, knights, and bishops
+  #       elsif n == 1 || n == 2 || n == 3
+  #         # There are rooks, knights, or bishops on the board
+  #         if @all_white_possible_moves[n] != nil
+  #           # Rooks, knights, and bishops come in pairs
+  #           for m in 0..1
+  #             if @all_white_possible_moves[n][m] != nil
+  #               for o in 0..7
+  #                 if @all_white_possible_moves[n][m][o] != nil
+  #                   if @all_white_possible_moves[n][m][o][0] == @black_king.x_position && @all_white_possible_moves[n][m][o][1] == @black_king.y_position
+  #                     checkmate?
+  #                     return true
+  #                   end
+  #                 end
+  #               end
+  #             end
+  #           end
+  #         end
+  #       # Queen or king
+  #       else
+  #         # The queen or king is on the board
+  #         if @all_white_possible_moves[n] != nil
+  #           if @all_white_possible_moves[n][0] != nil
+  #           # King or queen are unique pieces (m will always be 0)
+  #             for o in 0..7
+  #               if @all_white_possible_moves[n][m][o] != nil
+  #                 if @all_white_possible_moves[n][m][o][0] == @black_king.x_position && @all_white_possible_moves[n][m][o][1] == @black_king.y_position
+  #                   checkmate?
+  #                   return true
+  #                 end
+  #               end
+  #             end
+  #           end
+  #         end
+  #       end
+  #     end
 
-    # Black pieces
-    else
-      for n in 0..5
-        if n == 0
-          if @all_black_possible_moves[n] != nil
-            for m in 0..7
-              if @all_black_possible_moves[n][m] != nil
-                for o in 0..7
-                  if @all_black_possible_moves[n][m][o] != nil
-                    if @all_black_possible_moves[n][m][o][0] == @white_king.x_position && @all_black_possible_moves[n][m][o][1] == @white_king.y_position
-                      checkmate?
-                      return true
-                    end
-                  end
-                end
-              end
-            end
-          end
-        elsif n == 1 || n == 2 || n == 3
-          if @all_black_possible_moves[n] != nil
-            for m in 0..1
-              if @all_black_possible_moves[n][m] != nil
-                for o in 0..7
-                  if @all_black_possible_moves[n][m][o] != nil
-                    if @all_black_possible_moves[n][m][o][0] == @white_king.x_position && @all_black_possible_moves[n][m][o][1] == @white_king.y_position
-                      checkmate?
-                      return true
-                    end
-                  end
-                end
-              end
-            end
-          end
-        else
-          if @all_black_possible_moves[n] != nil
-            if @all_black_possible_moves[n][0] != nil
-              for o in 0..7
-                if @all_black_possible_moves[n][m][o] != nil
-                  if @all_black_possible_moves[n][m][o][0] == @white_king.x_position && @all_black_possible_moves[n][m][o][1] == @white_king.y_position
-                    checkmate?
-                    return true
-                  end
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-    # 1) Capture threatening pieces
-    # 2) Block threatening pieces
-    # 3) Move King to unchecking position
-    # b) Check whether moving the current piece would place the king in check
-  end
+  #   # Black pieces
+  #   else
+  #     for n in 0..5
+  #       if n == 0
+  #         if @all_black_possible_moves[n] != nil
+  #           for m in 0..7
+  #             if @all_black_possible_moves[n][m] != nil
+  #               for o in 0..7
+  #                 if @all_black_possible_moves[n][m][o] != nil
+  #                   if @all_black_possible_moves[n][m][o][0] == @white_king.x_position && @all_black_possible_moves[n][m][o][1] == @white_king.y_position
+  #                     checkmate?
+  #                     return true
+  #                   end
+  #                 end
+  #               end
+  #             end
+  #           end
+  #         end
+  #       elsif n == 1 || n == 2 || n == 3
+  #         if @all_black_possible_moves[n] != nil
+  #           for m in 0..1
+  #             if @all_black_possible_moves[n][m] != nil
+  #               for o in 0..7
+  #                 if @all_black_possible_moves[n][m][o] != nil
+  #                   if @all_black_possible_moves[n][m][o][0] == @white_king.x_position && @all_black_possible_moves[n][m][o][1] == @white_king.y_position
+  #                     checkmate?
+  #                     return true
+  #                   end
+  #                 end
+  #               end
+  #             end
+  #           end
+  #         end
+  #       else
+  #         if @all_black_possible_moves[n] != nil
+  #           if @all_black_possible_moves[n][0] != nil
+  #             for o in 0..7
+  #               if @all_black_possible_moves[n][m][o] != nil
+  #                 if @all_black_possible_moves[n][m][o][0] == @white_king.x_position && @all_black_possible_moves[n][m][o][1] == @white_king.y_position
+  #                   checkmate?
+  #                   return true
+  #                 end
+  #               end
+  #             end
+  #           end
+  #         end
+  #       end
+  #     end
+  #   end
+  #   # 1) Capture threatening pieces
+  #   # 2) Block threatening pieces
+  #   # 3) Move King to unchecking position
+  #   # b) Check whether moving the current piece would place the king in check
+  # end
 
-  def white_possible_moves
-    # Store all of the active (non-captured) white pieces on the board:
-    white_pawns = game.pieces.where(:type => "Pawn", :color => "white", :captured => nil).all
-    white_rooks = game.pieces.where(:type => "Rook", :color => "white", :captured => nil).all
-    white_knights = game.pieces.where(:type => "Knight", :color => "white", :captured => nil).all
-    white_bishops = game.pieces.where(:type => "Bishop", :color => "white", :captured => nil).all
-    white_queen = game.pieces.where(:type => "Queen", :color => "white", :captured => nil).first
-    white_king = game.pieces.where(:type => "King", :color => "white", :captured => nil).first
+  # def white_possible_moves
+  #   # Store all of the active (non-captured) white pieces on the board:
+  #   white_pawns = game.pieces.where(:type => "Pawn", :color => "white", :captured => nil).all
+  #   white_rooks = game.pieces.where(:type => "Rook", :color => "white", :captured => nil).all
+  #   white_knights = game.pieces.where(:type => "Knight", :color => "white", :captured => nil).all
+  #   white_bishops = game.pieces.where(:type => "Bishop", :color => "white", :captured => nil).all
+  #   white_queen = game.pieces.where(:type => "Queen", :color => "white", :captured => nil).first
+  #   white_king = game.pieces.where(:type => "King", :color => "white", :captured => nil).first
 
-    # For each white piece, check for and store all valid moves:
-    white_pawn_possible_moves = []
-    # n = 0
-    white_pawns.each do |white_pawn|
-      white_pawn_possible_moves += [white_pawn.possible_moves] if white_pawn != nil
-      # n += 1
-      # white_pawn_possible_moves.flatten(1) if n == white_pawns.count - 1
-    end
+  #   # For each white piece, check for and store all valid moves:
+  #   white_pawn_possible_moves = []
+  #   # n = 0
+  #   white_pawns.each do |white_pawn|
+  #     white_pawn_possible_moves += [white_pawn.possible_moves] if white_pawn != nil
+  #     # n += 1
+  #     # white_pawn_possible_moves.flatten(1) if n == white_pawns.count - 1
+  #   end
 
-    white_rook_possible_moves = []
-    white_rooks.each do |white_rook|
-      white_rook_possible_moves += [white_rook.possible_moves] if white_rook != nil
-    end
+  #   white_rook_possible_moves = []
+  #   white_rooks.each do |white_rook|
+  #     white_rook_possible_moves += [white_rook.possible_moves] if white_rook != nil
+  #   end
 
-    white_knight_possible_moves = []
-    white_knights.each do |white_knight|
-      white_knight_possible_moves += [white_knight.possible_moves] if white_knight != nil
-    end
+  #   white_knight_possible_moves = []
+  #   white_knights.each do |white_knight|
+  #     white_knight_possible_moves += [white_knight.possible_moves] if white_knight != nil
+  #   end
 
-    white_bishop_possible_moves = []
-    white_bishops.each do |white_bishop|
-      white_bishop_possible_moves += [white_bishop.possible_moves] if white_bishop != nil
-    end
+  #   white_bishop_possible_moves = []
+  #   white_bishops.each do |white_bishop|
+  #     white_bishop_possible_moves += [white_bishop.possible_moves] if white_bishop != nil
+  #   end
 
-    white_queen_possible_moves = [white_queen.possible_moves] if white_queen != nil
+  #   white_queen_possible_moves = [white_queen.possible_moves] if white_queen != nil
 
-    white_king_possible_moves = [white_king.possible_moves] if white_king != nil
+  #   white_king_possible_moves = [white_king.possible_moves] if white_king != nil
 
-    @all_white_possible_moves = [white_pawn_possible_moves, white_rook_possible_moves, white_knight_possible_moves, white_bishop_possible_moves, white_queen_possible_moves, white_king_possible_moves]
-    binding.pry
-  end
-
-
-  def black_possible_moves
-    # Store all of the active (non-captured) black pieces on the board:
-    black_pawns = game.pieces.where(:type => "Pawn", :color => "black", :captured => nil).all
-    black_rooks = game.pieces.where(:type => "Rook", :color => "black", :captured => nil).all
-    black_knights = game.pieces.where(:type => "Knight", :color => "black", :captured => nil).all
-    black_bishops = game.pieces.where(:type => "Bishop", :color => "black", :captured => nil).all
-    black_queen = game.pieces.where(:type => "Queen", :color => "black", :captured => nil).first
-    black_king = game.pieces.where(:type => "King", :color => "black", :captured => nil).first
-
-    # For each black piece, check for and store all valid moves:
-    black_pawn_possible_moves = []
-    black_pawns.each do |black_pawn|
-      black_pawn_possible_moves += [black_pawn.possible_moves] if black_pawn != nil
-    end
-
-    black_rook_possible_moves = []
-    black_rooks.each do |black_rook|
-      black_rook_possible_moves += [black_rook.possible_moves] if black_rook != nil
-    end
+  #   @all_white_possible_moves = [white_pawn_possible_moves, white_rook_possible_moves, white_knight_possible_moves, white_bishop_possible_moves, white_queen_possible_moves, white_king_possible_moves]
+  #   binding.pry
+  # end
 
 
-    black_knight_possible_moves = []
-    black_knights.each do |black_knight|
-      black_knight_possible_moves += [black_knight.possible_moves] if black_knight != nil
-    end
+  # def black_possible_moves
+  #   # Store all of the active (non-captured) black pieces on the board:
+  #   black_pawns = game.pieces.where(:type => "Pawn", :color => "black", :captured => nil).all
+  #   black_rooks = game.pieces.where(:type => "Rook", :color => "black", :captured => nil).all
+  #   black_knights = game.pieces.where(:type => "Knight", :color => "black", :captured => nil).all
+  #   black_bishops = game.pieces.where(:type => "Bishop", :color => "black", :captured => nil).all
+  #   black_queen = game.pieces.where(:type => "Queen", :color => "black", :captured => nil).first
+  #   black_king = game.pieces.where(:type => "King", :color => "black", :captured => nil).first
 
-    black_bishop_possible_moves = []
-    black_bishops.each do |black_bishop|
-      black_bishop_possible_moves += [black_bishop.possible_moves] if black_bishop != nil
-    end
+  #   # For each black piece, check for and store all valid moves:
+  #   black_pawn_possible_moves = []
+  #   black_pawns.each do |black_pawn|
+  #     black_pawn_possible_moves += [black_pawn.possible_moves] if black_pawn != nil
+  #   end
 
-    black_queen_possible_moves = [black_queen.possible_moves] if black_queen != nil
+  #   black_rook_possible_moves = []
+  #   black_rooks.each do |black_rook|
+  #     black_rook_possible_moves += [black_rook.possible_moves] if black_rook != nil
+  #   end
 
-    black_king_possible_moves = [black_king.possible_moves] if black_king != nil
 
-    @all_black_possible_moves = [black_pawn_possible_moves, black_rook_possible_moves, black_knight_possible_moves, black_bishop_possible_moves, black_queen_possible_moves, black_king_possible_moves]
-    binding.pry
-  end
+  #   black_knight_possible_moves = []
+  #   black_knights.each do |black_knight|
+  #     black_knight_possible_moves += [black_knight.possible_moves] if black_knight != nil
+  #   end
+
+  #   black_bishop_possible_moves = []
+  #   black_bishops.each do |black_bishop|
+  #     black_bishop_possible_moves += [black_bishop.possible_moves] if black_bishop != nil
+  #   end
+
+  #   black_queen_possible_moves = [black_queen.possible_moves] if black_queen != nil
+
+  #   black_king_possible_moves = [black_king.possible_moves] if black_king != nil
+
+  #   @all_black_possible_moves = [black_pawn_possible_moves, black_rook_possible_moves, black_knight_possible_moves, black_bishop_possible_moves, black_queen_possible_moves, black_king_possible_moves]
+  #   binding.pry
+  # end
 
 # *** Checkmate isn't when the king is captured.  It is when the king can be captured and there is no way to prevent it. ***
   # def checkmate?
