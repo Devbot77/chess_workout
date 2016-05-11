@@ -152,7 +152,6 @@ class Piece < ActiveRecord::Base
 
   # Determine if checkmate on opposing king has occurred.
   def demo_checkmate?
-    binding.pry
     checkmate = false
     can_escape = false
     can_block = false
@@ -169,12 +168,19 @@ class Piece < ActiveRecord::Base
     escape_moves.each do |move|
       can_escape = true if !friendly_possible_moves.include?(move)
     end
-    # Determine if threating piece can be captured by opposing player. Can only be true if a singular piece has opposing king in check. 
-    can_capture_threat = true if opponent_possible_moves.include?([@x1, @y1]) && @threatening_pieces.length == 1
-    # Code to determine if opponent can
-    # block threatening piece(s) goes here
+    
+    # Determine if threating piece can be captured or blocked by opposing player. 
+    # Can only be true if a singular piece has opposing king in check. 
+    if @threatening_pieces.length == 1
+      can_capture_threat = true if opponent_possible_moves.include?([@x1, @y1])
+
+      threat_path(@threatening_pieces[0], @opponent_king).each do |path_coord|
+        can_block = true if opponent_possible_moves.include?(path_coord)
+      end
+    end
 
     checkmate = true if !can_escape && !can_block && !can_capture_threat
+    binding.pry
     return checkmate
   end
 
@@ -208,6 +214,47 @@ class Piece < ActiveRecord::Base
     elsif @threatening_pieces.length > 1
       return false
     end
+  end
+
+  def block_threat?
+    if @threatening_pieces.length == 1
+
+    else
+      return false
+    end
+  end
+
+  def threat_path(threat, king)
+    path = []
+    x0 = threat.x_position
+    y0 = threat.y_position
+    x1 = king.x_position
+    y1 = king.y_position
+    if x0 != x1 && y0 == y1
+      if x1 > x0
+        (x0+1...x1).each {|x| path << [x, y0]}
+      else
+        (x1+1...x0).each {|x| path << [x, y0]}
+      end
+    elsif x0 == x1 && y0 != y1
+      if y1 > y0
+        (y0+1...y1).each {|y| path << [y, x0]}
+      else
+        (y1+1...y0).each {|y| path << [y, x0]}
+      end
+    else
+      if x1 > x0 && y1 > y0
+        (x0+1...x1).each {|x| path << [x, y0+(x - x0)]}
+      elsif x1 < x0 && y1 > y0
+        (x1+1...x0).each {|x| path << [x, y1-(x - x1)]}
+      elsif x1 > x0 && y1 < y0
+        (x0+1...x1).each {|x| path << [x, y0-(x - x0)]}
+      else
+        (x1+1...x0).each {|x| path << [x, y1+(x - x1)]}
+      end
+    end
+    binding.pry
+    return path
   end
 
   # Find the diagonal paths for a piece given the starting X and Y coordinates of that piece.
