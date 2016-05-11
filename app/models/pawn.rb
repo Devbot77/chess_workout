@@ -9,7 +9,6 @@ class Pawn < Piece
   end
 
   def possible_moves
-    binding.pry
     possible_moves = []
     x = x_position
     y = y_position

@@ -242,8 +242,8 @@ class Piece < ActiveRecord::Base
     y = y_coord + 1
     until x == 0 || y == 9 do
       range << [x, y]
-      x += 1
-      y -= 1
+      x -= 1
+      y += 1
     end
 
     return range
