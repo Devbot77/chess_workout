@@ -158,10 +158,10 @@ class Piece < ActiveRecord::Base
     can_capture_threat = false
     escape_moves = @opponent_king.possible_moves
     if color == "white"
-      opponent_possible_moves = black_pieces_moves
+      opponent_possible_moves = black_moves_noking
       friendly_possible_moves = white_pieces_moves
     else
-      opponent_possible_moves = white_pieces_moves
+      opponent_possible_moves = white_moves_noking
       friendly_possible_moves = black_pieces_moves
     end
     # Determine if king in check can escape
@@ -172,7 +172,7 @@ class Piece < ActiveRecord::Base
     # Determine if threating piece can be captured or blocked by opposing player. 
     # Can only be true if a singular piece has opposing king in check. 
     if @threatening_pieces.length == 1
-      can_capture_threat = true if opponent_possible_moves.include?([@x1, @y1])
+      can_capture_threat = true if opponent_possible_moves.include?([@x1, @y1]) || escape_moves.include?([@x1, @y1])
 
       threat_path(@threatening_pieces[0], @opponent_king).each do |path_coord|
         can_block = true if opponent_possible_moves.include?(path_coord)
@@ -226,6 +226,7 @@ class Piece < ActiveRecord::Base
 
   def threat_path(threat, king)
     path = []
+    return path if threat.type == "Knight"
     x0 = threat.x_position
     y0 = threat.y_position
     x1 = king.x_position
@@ -316,6 +317,24 @@ class Piece < ActiveRecord::Base
     end
     return @possible_moves
   end
+
+  def white_moves_noking
+    @possible_moves = []
+    self.game.white_pieces.where(captured: nil).map do |piece|
+      next if piece.type == "King"
+      @possible_moves += piece.possible_moves
+    end
+    return @possible_moves
+  end
+
+  def black_moves_noking
+    @possible_moves = []
+    self.game.black_pieces.where(captured: nil).map do |piece|
+      next if piece.type == "King"
+      @possible_moves += piece.possible_moves
+    end
+    return @possible_moves
+  end  
 
   # def check?
   #   # a) Determine a list of valid player moves that could put an enemy's king in check based upon where it is:
